@@ -1,9 +1,0 @@
-PyQt5>=5.15
-pygame>=2.6
-cffi>=1.16
-numpy>=1.26
-llama-cpp-python>=0.2.0
-PyYAML>=6.0
-psutil>=5.9
-inputs>=0.5
-requests>=2.31
