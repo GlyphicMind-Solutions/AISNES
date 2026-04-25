@@ -1,0 +1,173 @@
+{
+  "game": "FinalFantasy3SNES.smc",
+  "version": 3,
+  "definition": "AIConfig for Final Fantasy 3 (SNES). Defines button meanings, output examples, global logic, map logic, battle logic, situational logic, and boot logic. Supports shorthand JSON output. Created By: David Kistner (Unconditional Love).",
+  "buttons": {
+    "A": "talk / confirm / examine / enter-exit",
+    "B": "run / cancel",
+    "X": "main menu",
+    "Y": "switch party",
+    "L": "cycle character (left)",
+    "R": "cycle character (right)",
+    "START": "pause",
+    "SELECT": "rare / unused",
+    "UP": "move up",
+    "DOWN": "move down",
+    "LEFT": "move left",
+    "RIGHT": "move right"
+  },
+  "Output Instructions": [
+    {
+      "UP": 1
+    },
+    {
+      "Y": 1
+    },
+    {
+      "DOWN": 1,
+      "A": 1
+    },
+    {
+      "LEFT": 1,
+      "X": 1
+    },
+    {
+      "RIGHT": 1,
+      "R": 1,
+      "B": 1
+    }
+  ],
+  "Boot Logic": [
+    {
+      "frames": "1500-60000",
+      "action": {
+        "A": 1
+      },
+      "reason": "advance title screen and intro dialogue"
+    },
+    {
+      "condition": "frame > 100000",
+      "action": {
+        "UP": 1
+      },
+      "reason": "start moving forward"
+    },
+    {
+      "movement": {
+        "UP": {
+          "UP": 1
+        },
+        "DOWN": {
+          "DOWN": 1
+        },
+        "LEFT": {
+          "LEFT": 1
+        },
+        "RIGHT": {
+          "RIGHT": 1
+        }
+      }
+    }
+  ],
+  "Global Logic": [
+    "Default exploration priority: UP \u2192 LEFT \u2192 RIGHT \u2192 DOWN.",
+    "If CUTSCENE = true \u2192 output {} (do not interrupt).",
+    "If CAN_MOVE = false and not CUTSCENE \u2192 try UP/DOWN/LEFT/RIGHT; if still stuck \u2192 press A.",
+    "If WORLD_STATE = unknown \u2192 try movement first; if no movement \u2192 press A or B.",
+    "If in a menu \u2192 A = confirm, B = cancel.",
+    "If in battle \u2192 use battle logic.",
+    "If CAN_MOVE = true and not in battle and not in menu \u2192 output at least one directional button.",
+    "If movement does not change PLAYER position \u2192 mark direction as blocked and try another.",
+    "If near NPC \u2192 press A.",
+    "If near door \u2192 press A.",
+    "If no interaction available \u2192 keep moving UP."
+  ],
+  "Map Logic": {
+    "0x0150": [
+      "Narshe Overworld",
+      "If in battle \u2192 use battle logic.",
+      "If in menu \u2192 use menu logic.",
+      "If near door \u2192 press A.",
+      "If near NPC \u2192 press A.",
+      "If CAN_MOVE and not blocked_up \u2192 press UP.",
+      "If blocked_up and not blocked_left \u2192 press LEFT.",
+      "If blocked_up and blocked_left and not blocked_right \u2192 press RIGHT.",
+      "If all directions blocked \u2192 press A once."
+    ],
+    "0x0140": [
+      "Narshe Town",
+      "If near door \u2192 press A.",
+      "If near NPC \u2192 press A.",
+      "If CAN_MOVE and not blocked_up \u2192 press UP.",
+      "If blocked_up \u2192 try LEFT then RIGHT.",
+      "If at (10,20) \u2192 press RIGHT (toward shop).",
+      "If at (15,30) \u2192 press UP (toward elder's house)."
+    ],
+    "0x0130": [
+      "Narshe Mines",
+      "If in battle \u2192 use battle logic.",
+      "If near switch tile \u2192 press A.",
+      "If CAN_MOVE and not blocked_up \u2192 press UP.",
+      "If blocked_up \u2192 try LEFT or RIGHT.",
+      "If near sparkle tile \u2192 press A."
+    ],
+    "0x00A0": [
+      "Figaro Castle",
+      "If near door \u2192 press A.",
+      "If near NPC \u2192 press A.",
+      "If CAN_MOVE and not blocked_right \u2192 press RIGHT.",
+      "If at (5,10) \u2192 press DOWN (toward throne room).",
+      "If at (20,8) \u2192 press A (talk to Edgar)."
+    ],
+    "0x00B0": [
+      "South Figaro",
+      "If near door \u2192 press A.",
+      "If near NPC \u2192 press A.",
+      "If CAN_MOVE and not blocked_left \u2192 press LEFT.",
+      "If blocked_left \u2192 try UP or DOWN.",
+      "If at (12,18) \u2192 press UP (toward pub).",
+      "If at (8,22) \u2192 press RIGHT (toward item shop)."
+    ],
+    "0x00C0": [
+      "Lete River",
+      "If in battle \u2192 use battle logic.",
+      "If CAN_MOVE \u2192 press UP (follow river).",
+      "If blocked_up \u2192 press RIGHT.",
+      "If blocked_up and blocked_right \u2192 press LEFT."
+    ],
+    "0x00D0": [
+      "Zozo",
+      "If near NPC \u2192 press A (many hostile).",
+      "If CAN_MOVE and not blocked_up \u2192 press UP.",
+      "If blocked_up \u2192 try RIGHT.",
+      "If at (14,10) \u2192 press A (enter inn).",
+      "If at (20,5) \u2192 press A (enter relic shop)."
+    ]
+  },
+  "Battle Logic": [
+    "If BATTLE_MENU = true \u2192 navigate with UP/DOWN and confirm with A.",
+    "If TARGET_MENU = true \u2192 use UP/DOWN then A.",
+    "If COMMAND_MENU = true \u2192 prefer ATTACK \u2192 SPECIAL \u2192 MAGIC.",
+    "If COMMAND_MENU and cursor not on ATTACK \u2192 press UP until ATTACK is highlighted, then A.",
+    "If MAGIC_MENU = true \u2192 press A on first available spell.",
+    "If LOW_HP = true \u2192 navigate to ITEM or MAGIC \u2192 select healing.",
+    "If ENEMY_COUNT > 1 \u2192 prefer multi-target abilities.",
+    "If ENEMY_COUNT = 1 \u2192 use ATTACK or SPECIAL.",
+    "If CONFUSED or STATUS_MENU = true \u2192 press B.",
+    "If WAITING (ATB not full) \u2192 output {}.",
+    "If CAN_SELECT_ACTION = true \u2192 press A.",
+    "If unsure \u2192 press A once."
+  ],
+  "Situational Logic": [
+    "If near NPC or object \u2192 press A.",
+    "If exploring \u2192 move in any direction.",
+    "If in menu \u2192 A = confirm, B = cancel.",
+    "If in battle \u2192 use battle logic.",
+    "If idle \u2192 move UP/DOWN/LEFT/RIGHT.",
+    "If CAN_MOVE = true \u2192 must output a directional button.",
+    "If CUTSCENE = true \u2192 output {}.",
+    "If FRAME < 3000 \u2192 follow boot logic."
+  ],
+  "history": [],
+  "notes": "Published By: GlyphicMind Solutions LLC"
+}
