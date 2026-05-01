@@ -26,7 +26,9 @@ def main():
 
     sys.exit(app.exec_())
 
-
+# ----------------------------
+# if name = main (for window)
+# ----------------------------
 if __name__ == "__main__":
     main()
 
